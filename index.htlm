@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uvids - Simple Video Workspace</title>
+    
+    <!-- Google Fonts (Naya Logo Font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Favicon (Tab par dikhne wala chhota icon) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23a855f7'/><text y='.9em' font-size='80' x='10' fill='white'>▶</text></svg>">
+
+    <style>
+        :root {
+            --bg-color: #0b0f19; 
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #6366f1; 
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; padding: 20px; }
+        .app-container { width: 100%; max-width: 500px; }
+
+        /* Header & Logo Styling */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .brand-text { font-size: 26px; display: flex; align-items: baseline; }
+        .brand-u { font-family: 'Great Vibes', cursive; font-size: 38px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-right: 2px; line-height: 1; }
+        .brand-vids { font-family: 'Inter', sans-serif; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; }
+        .badge { font-size: 10px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 6px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Hero Section */
+        .hero { text-align: center; margin-bottom: 40px; }
+        .hero h1 { font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 15px; letter-spacing: -0.5px; }
+        .hero h1 span { color: var(--primary); }
+        .hero p { color: var(--text-muted); font-size: 14px; line-height: 1.6; max-width: 400px; margin: 0 auto; }
+
+        /* Main Tool Card */
+        .tool-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
+        .tool-card h3 { font-size: 18px; margin-bottom: 5px; font-weight: 600; }
+        .tool-card .subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+        
+        .input-label { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
+        .input-field { width: 100%; padding: 16px; background: #030712; border: 1px solid var(--border-color); border-radius: 12px; color: white; font-size: 15px; outline: none; transition: border 0.3s; margin-bottom: 15px; }
+        .input-field:focus { border-color: var(--primary); }
+
+        .action-btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .action-btn:hover { background: var(--primary-hover); }
+        .action-btn:disabled { background: #374151; cursor: not-allowed; }
+
+        /* Result Area */
+        .result-area { display: none; margin-top: 25px; background: #030712; border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
+        .video-thumb { width: 100%; border-radius: 12px; margin-bottom: 15px; display: none; object-fit: cover; max-height: 250px; }
+        .video-title { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 15px; line-height: 1.4; }
+        .dl-btn { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 14px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; margin-bottom: 10px; }
+        .btn-hd { background: var(--success); color: white; }
+        .btn-sd { background: #3b82f6; color: white; }
+
+        /* Supported Sources */
+        .sources-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
+        .sources-card h3 { font-size: 18px; margin-bottom: 10px; font-weight: 600; }
+        .sources-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+        .sources-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .source-box { background: #030712; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .source-box:hover { border-color: var(--primary); }
+        .source-icon { font-size: 24px; margin-bottom: 8px; }
+        .source-name { font-size: 12px; font-weight: 600; }
+
+        /* Ad Containers */
+        .ad-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; min-height: 100px; }
+
+        /* Footer */
+        .footer { text-align: center; color: var(--text-muted); font-size: 12px; line-height: 1.6; margin-top: 30px; }
+        .footer strong { color: var(--text-main); }
+
+        /* Loader */
+        .loader { display: none; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid white; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .error-msg { color: #ef4444; font-size: 13px; text-align: center; margin-top: 15px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- HEADER & LOGO -->
+    <header class="header">
+        <div class="logo-container">
+            <!-- Custom SVG Logo Icon -->
+            <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#a855f7" />
+                        <stop offset="100%" stop-color="#ec4899" />
+                    </linearGradient>
+                </defs>
+                <rect width="40" height="40" rx="12" fill="url(#logoGrad)"/>
+                <path d="M12 14V24C12 28.4183 15.5817 32 20 32C24.4183 32 28 28.4183 28 24V14" stroke="white" stroke-width="4" stroke-linecap="round"/>
+                <path d="M18 19L23 22L18 25V19Z" fill="white"/>
+            </svg>
+
+            <!-- Brand Text (Calligraphy U + Normal vids) -->
+            <div class="brand-text">
+                <span class="brand-u">U</span>
+                <span class="brand-vids">vids</span>
+            </div>
+        </div>
+
+        <div class="badge">● Free Toolkit</div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Videos made <br><span>simple.</span></h1>
+        <p>Preview supported video links, download from your favorite platforms, and keep your workspace clean.</p>
+    </div>
+
+    <!-- Main Tool Card -->
+    <div class="tool-card">
+        <h3>🎬 Video download tool</h3>
+        <p class="subtitle">Paste a direct video file URL or a link from a supported platform.</p>
+        
+        <label class="input-label">Video URL</label>
+        <input type="text" id="videoUrl" class="input-field" placeholder="https://www.facebook.com/...">
+        
+        <button id="mainBtn" class="action-btn" onclick="getVideo()">
+            <span id="btnText">Check link ↗</span>
+            <div id="btnLoader" class="loader"></div>
+        </button>
+
+        <div id="errorDiv" class="error-msg"></div>
+
+        <!-- Result Area -->
+        <div id="resultArea" class="result-area">
+            <img id="vidThumb" class="video-thumb" src="">
+            <div id="vidTitle" class="video-title"></div>
+            <a id="btnHd" href="#" target="_blank" class="dl-btn btn-hd">Download HD Quality</a>
+            <a id="btnSd" href="#" target="_blank" class="dl-btn btn-sd">Download Normal Quality</a>
+        </div>
+    </div>
+
+    <!-- AD SPACE 1 -->
+    <div class="ad-container">
+        <!-- Yahan Adsterra ka 728x90 ya Native Banner code lagayein -->
+        <span style="color:#374151; font-size:12px;">[ Advertisement ]</span>
+    </div>
+
+    <!-- Supported Sources -->
+    <div class="sources-card">
+        <h3>Supported link sources</h3>
+        <p>Open the original platform to copy a link, then paste it above.</p>
+        <div class="sources-grid">
+            <div class="source-box" onclick="setPlaceholder('YouTube')">
+                <div class="source-icon" style="color:#ff0000;">▶</div>
+                <div class="source-name">YouTube</div>
+            </div>
+            <div class="source-box" onclick="setPlaceholder('Instagram')">
+                <div class="source-icon" style="color:#e1306c;">📸</div>
+                <div class="source-name">Instagram</div>
+            </div>
+            <div class="source-box" onclick="setPlaceholder('Facebook')">
+                <div class="source-icon" style="color:#1877f2;">f</div>
+                <div class="source-name">Facebook</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <strong>Uvids</strong> · Simple tools for supported video links.<br>
+        Respect copyright and platform terms. This tool is not affiliated with YouTube, Instagram, or Facebook.
+    </div>
+</div>
+
+<!-- AD MODAL POPUP -->
+<div id="adModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:#111827; border:1px solid #1f2937; border-radius:20px; padding:25px; width:90%; max-width:400px; text-align:center;">
+        <h2 style="color:white; font-size:18px; margin-bottom:15px;">Your download is ready!</h2>
+        
+        <!-- AD SPACE 2 -->
+        <div style="margin-bottom:20px; min-height:250px; display:flex; justify-content:center; align-items:center; background:#030712; border:1px dashed #374151; border-radius:12px;">
+            <!-- Yahan Adsterra ka 300x250 Banner code lagayein -->
+            <span style="color:#374151; font-size:12px;">[ Ad Space ]</span>
+        </div>
+        
+        <button onclick="startActualDownload()" style="width:100%; padding:15px; background:#10b981; color:white; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer;">Close Ad & Download</button>
+    </div>
+</div>
+
+<script>
+    var currentHdUrl = "";
+    var currentSdUrl = "";
+    var pendingDownloadUrl = "";
+
+    function setPlaceholder(platform) {
+        var input = document.getElementById('videoUrl');
+        input.focus();
+        if(platform === 'YouTube') input.placeholder = "Paste YouTube link here...";
+        if(platform === 'Instagram') input.placeholder = "Paste Instagram Reel link here...";
+        if(platform === 'Facebook') input.placeholder = "Paste Facebook Video link here...";
+    }
+
+    function triggerDownload(type) {
+        var url = (type === 'hd') ? currentHdUrl : currentSdUrl;
+        if (!url) return;
+        pendingDownloadUrl = url;
+        document.getElementById('adModal').style.display = 'flex';
+    }
+
+    function startActualDownload() {
+        document.getElementById('adModal').style.display = 'none';
+        if(pendingDownloadUrl) {
+            window.open(pendingDownloadUrl, '_blank');
+            pendingDownloadUrl = "";
+        }
+    }
+
+    async function getVideo() {
+        var urlInput = document.getElementById('videoUrl').value;
+        var errorDiv = document.getElementById('errorDiv');
+        var btn = document.getElementById('mainBtn');
+        var btnText = document.getElementById('btnText');
+        var btnLoader = document.getElementById('btnLoader');
+        var resultArea = document.getElementById('resultArea');
+        
+        if (!urlInput) { 
+            errorDiv.innerText = "Please enter a valid URL."; 
+            return; 
+        }
+        
+        errorDiv.innerText = "";
+        btn.disabled = true; 
+        btnText.style.display = 'none'; 
+        btnLoader.style.display = 'block';
+        resultArea.style.display = 'none';
+        
+        try {
+            var myApiUrl = 'https://nebula-api-6cc6.onrender.com/download'; 
+            
+            var response = await fetch(myApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: urlInput })
+            });
+            
+            var data = await response.json();
+            
+            if (data.status === "success") {
+                var thumbImg = document.getElementById('vidThumb');
+                if (data.thumbnail) { 
+                    thumbImg.src = data.thumbnail; 
+                    thumbImg.style.display = 'block'; 
+                } else { 
+                    thumbImg.style.display = 'none'; 
+                }
+                
+                document.getElementById('vidTitle').innerText = data.title || "Video Link Found";
+                
+                currentHdUrl = data.hd_url || "";
+                currentSdUrl = data.sd_url || "";
+                
+                document.getElementById('btnHd').style.display = currentHdUrl ? 'flex' : 'none';
+                document.getElementById('btnSd').style.display = currentSdUrl ? 'flex' : 'none';
+                
+                document.getElementById('btnHd').onclick = function(e) { e.preventDefault(); triggerDownload('hd'); };
+                document.getElementById('btnSd').onclick = function(e) { e.preventDefault(); triggerDownload('sd'); };
+
+                resultArea.style.display = 'block';
+            } else {
+                errorDiv.innerText = "Error: " + (data.detail || "Video not found. Try another link.");
+            }
+        } catch (e) {
+            errorDiv.innerText = "Network Error. Server is waking up, please try again in 30s.";
+        } finally {
+            btn.disabled = false; 
+            btnText.style.display = 'block'; 
+            btnLoader.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
