@@ -105,6 +105,7 @@
 <body>
 
 <div class="app-container">
+    <!-- HEADER -->
     <header class="header">
         <div class="logo-container">
             <div class="logo-icon">
@@ -117,11 +118,13 @@
         <div class="badge">● Free</div>
     </header>
 
+    <!-- HERO -->
     <div class="hero">
         <h1>Videos & Audio <br><span>made simple.</span></h1>
         <p>Download in high-quality from your favorite platforms.</p>
     </div>
 
+    <!-- TABS -->
     <div class="tabs-container">
         <button class="tab-btn active" onclick="setTab('YouTube', this)">
             <svg viewBox="0 0 24 24" fill="#ff0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
@@ -137,6 +140,7 @@
         </button>
     </div>
 
+    <!-- TOOL CARD -->
     <div class="tool-card">
         <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">PASTE VIDEO LINK</label>
         <input type="text" id="videoUrl" class="input-field" placeholder="https://www.youtube.com/...">
@@ -160,10 +164,12 @@
         </div>
     </div>
 
+    <!-- AD SPACE -->
     <div id="offers-section" class="ad-container">
         <span style="color:#374151; font-size:12px;">[ Advertisement ]</span>
     </div>
 
+    <!-- HOW TO USE -->
     <h2 id="how-to" class="section-title">How to Download?</h2>
     <div class="steps-container">
         <div class="step-card"><div class="step-num">1</div><h4>Copy the Link</h4><p>Open the app and copy the video link.</p></div>
@@ -171,12 +177,14 @@
         <div class="step-card"><div class="step-num">3</div><h4>Download</h4><p>Choose your quality and save it.</p></div>
     </div>
 
+    <!-- WHY US -->
     <h2 id="features" class="section-title">Why Choose Uvids?</h2>
     <div class="features-grid">
         <div class="feature-box"><div class="feature-icon">⚡</div><h4>Super Fast</h4><p>Instant downloads.</p></div>
         <div class="feature-box"><div class="feature-icon">🔒</div><h4>100% Private</h4><p>We never store links.</p></div>
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
         <div class="footer-links">
             <a href="about.html">About Us</a>
@@ -191,12 +199,14 @@
     </div>
 </div>
 
+<!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav">
     <a href="#" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span>Home</span></a>
     <a href="#how-to" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><span>How to Use</span></a>
     <a href="#features" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg><span>Features</span></a>
 </div>
 
+<!-- AD MODAL POPUP -->
 <div id="adModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:#111827; border:1px solid #1f2937; border-radius:20px; padding:25px; width:90%; max-width:400px; text-align:center;">
         <h2 style="color:white; font-size:18px; margin-bottom:15px;">Your download is ready!</h2>
@@ -208,7 +218,7 @@
 </div>
 
 <!-- ========================================== -->
-<!-- AAPKA JAVASCRIPT CODE YAHAN HAI -->
+<!-- POORA JAVASCRIPT CODE YAHAN HAI -->
 <!-- ========================================== -->
 <script>
     var currentHdUrl = ""; var currentSdUrl = ""; var currentAudioUrl = ""; var pendingDownloadUrl = "";
@@ -255,41 +265,39 @@
         
         if (!urlInput) { 
             errorDiv.style.display = 'block'; 
-            errorDiv.innerText = "Please enter a valid URL."; 
+            errorDiv.innerText = "Kripya pehle koi link daalein."; 
             return; 
         }
         
+        // Loading Start
         errorDiv.style.display = 'none';
         btn.disabled = true; 
         btnText.style.display = 'none'; 
         btnLoader.style.display = 'block';
         resultArea.style.display = 'none';
         
-        var myApiUrl = 'https://nebula-api-6cc6.onrender.com/download'; 
-        var maxRetries = 3;
-        var delay = 5000; // 5 seconds wait
+        try {
+            var myApiUrl = 'https://nebula-api-6cc6.onrender.com/download'; 
+            
+            var response = await fetch(myApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: urlInput })
+            });
+            
+            var data = await response.json();
 
-        for (let i = 0; i < maxRetries; i++) {
-            try {
-                var response = await fetch(myApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: urlInput })
-                });
+            if (data.status === "success") {
+                var thumbImg = document.getElementById('vidThumb');
+                if (data.thumbnail) { thumbImg.src = data.thumbnail; thumbImg.style.display = 'block'; } 
+                else { thumbImg.style.display = 'none'; }
                 
-                var data = await response.json();
-
-                if (data.status === "success") {
-                    var thumbImg = document.getElementById('vidThumb');
-                    if (data.thumbnail) { thumbImg.src = data.thumbnail; thumbImg.style.display = 'block'; } 
-                    else { thumbImg.style.display = 'none'; }
-                    
-                    document.getElementById('vidTitle').innerText = data.title || "Video Found";
-                    currentHdUrl = data.hd_url || ""; currentSdUrl = data.sd_url || ""; currentAudioUrl = data.audio_url || "";
-                    
-                    document.getElementById('btnHd').style.display = currentHdUrl ? 'flex' : 'none';
-                    document.getElementById('btnSd').style.display = currentSdUrl ? 'flex' : 'none';
-                    document.getElementById('btnMp3').style.display = currentAudioUrl ? 'flex' : 'none';
-                    
-                    document.getElementById('btnHd').onclick = function(e) { e.preventDefault(); triggerDownload(currentHdUrl); };
-                    document.getElementById('btnSd').onclick = function(e) { e.preventDefau
+                document.getElementById('vidTitle').innerText = data.title || "Video Found";
+                currentHdUrl = data.hd_url || ""; currentSdUrl = data.sd_url || ""; currentAudioUrl = data.audio_url || "";
+                
+                document.getElementById('btnHd').style.display = currentHdUrl ? 'flex' : 'none';
+                document.getElementById('btnSd').style.display = currentSdUrl ? 'flex' : 'none';
+                document.getElementById('btnMp3').style.display = currentAudioUrl ? 'flex' : 'none';
+                
+                document.getElementById('btnHd').onclick = function(e) { e.preventDefault(); triggerDownload(currentHdUrl); };
+                document.getElem
