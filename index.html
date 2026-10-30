@@ -7,7 +7,8 @@
     <title>Uvids - Premium Video & Audio Downloader</title>
     <meta name="description" content="Download high-quality videos and MP3 audio from Facebook, Instagram, and YouTube for free.">
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23a855f7'/><text y='.9em' font-size='80' x='10' fill='white'>▶</text></svg>">
 
     <style>
@@ -23,6 +24,20 @@
         body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 15px 100px 15px; }
         
         .app-container { width: 100%; max-width: 480px; flex: 1; }
+
+        /* Heartbeat Animation */
+        .heart-beat {
+            animation: heartbeat 1.5s infinite;
+            display: inline-block;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.3); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.3); }
+            60% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
 
         /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
@@ -59,7 +74,7 @@
         /* RESULT AREA */
         .result-area { display: none; margin-top: 25px; background: #03050a; border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
         .video-thumb { width: 100%; border-radius: 12px; margin-bottom: 15px; display: none; object-fit: cover; max-height: 200px; }
-        .video-title { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 15px; line-height: 1.4; }
+        .video-title { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 15px; line-height: 1.4; word-break: break-word; }
         
         .dl-btn { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 15px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; margin-bottom: 10px; color: white !important; transition: 0.3s; }
         .dl-btn:hover { transform: scale(1.02); }
@@ -67,7 +82,9 @@
         .btn-sd { background: #3b82f6; }
         .btn-mp3 { background: #f59e0b; }
         
-        .reset-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 10px; text-align: center; transition: 0.3s; }
+        .reset-btn { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .reset-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+        .reset-btn svg { width: 16px; height: 16px; }
 
         /* ERROR ALERT */
         .error-alert { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; padding: 12px; border-radius: 10px; font-size: 13px; margin-top: 15px; text-align: center; line-height: 1.4; word-wrap: break-word; }
@@ -102,8 +119,7 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
-
-    <body>
+<body>
 
 <div class="app-container">
     <header class="header">
@@ -150,14 +166,20 @@
         <div id="errorDiv" class="error-alert"></div>
 
         <div id="resultArea" class="result-area">
-            <img id="vidThumb" class="video-thumb" src="">
+            <img id="vidThumb" class="video-thumb" src="" onerror="this.style.display='none'">
             <div id="vidTitle" class="video-title"></div>
             
             <a id="btnHd" href="#" target="_blank" class="dl-btn btn-hd">Download HD Video</a>
             <a id="btnSd" href="#" target="_blank" class="dl-btn btn-sd">Download Normal Video</a>
             <a id="btnMp3" href="#" target="_blank" class="dl-btn btn-mp3">🎵 Download MP3 Audio</a>
             
-            <button class="reset-btn" onclick="resetTool()">🔄 Download Another Video</button>
+            <button class="reset-btn" onclick="resetTool()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
+                Download Another Video
+            </button>
         </div>
     </div>
 
@@ -178,6 +200,7 @@
         <div class="feature-box"><div class="feature-icon">🔒</div><h4>100% Private</h4><p>We never store links.</p></div>
     </div>
 
+    <!-- FOOTER START -->
     <div class="footer">
         <div class="footer-links">
             <a href="about.html">About Us</a>
@@ -187,9 +210,20 @@
             <a href="dmca.html">DMCA</a>
             <a href="contact.html">Contact</a>
         </div>
-        <p style="margin-bottom: 10px; font-weight: 500; color: #e2e8f0;">Made with <span style="color: #ec4899;">❤️</span> From Village Post Basari M.P</p>
+        
+        <!-- AAPKI DEDICATION LINE YAHAN HAI -->
+        <div style="text-align: center; margin: 20px 0 10px 0;">
+            <p style="font-family: 'Inter', sans-serif; font-size: 13px; color: #9ca3af; margin-bottom: 5px;">
+                Crafted with <span style="color: #6366f1;">💻</span> & <span class="heart-beat" style="color: #ec4899;">❤️</span> for
+            </p>
+            <h2 style="font-family: 'Great Vibes', cursive; font-size: 42px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; line-height: 1.2;">
+                Kanishtha Chaudhary
+            </h2>
+        </div>
+
         <strong>Uvids</strong> · Simple tools for video links.
     </div>
+    <!-- FOOTER END -->
 </div>
 
 <div class="bottom-nav">
@@ -210,6 +244,12 @@
 
 <script>
     var currentHdUrl = ""; var currentSdUrl = ""; var currentAudioUrl = ""; var pendingDownloadUrl = "";
+
+    function decodeHTML(html) {
+        var txt = document.createElement("textarea");
+        txt.innerHTML = html;
+        return txt.value;
+    }
 
     function setTab(platform, btn) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -276,10 +316,16 @@
 
             if (data.status === "success") {
                 var thumbImg = document.getElementById('vidThumb');
-                if (data.thumbnail) { thumbImg.src = data.thumbnail; thumbImg.style.display = 'block'; } 
-                else { thumbImg.style.display = 'none'; }
+                if (data.thumbnail) { 
+                    thumbImg.src = data.thumbnail; 
+                    thumbImg.style.display = 'block'; 
+                } else { 
+                    thumbImg.style.display = 'none'; 
+                }
                 
-                document.getElementById('vidTitle').innerText = data.title || "Video Found";
+                var cleanTitle = decodeHTML(data.title || "Video Found");
+                document.getElementById('vidTitle').innerText = cleanTitle;
+                
                 currentHdUrl = data.hd_url || ""; currentSdUrl = data.sd_url || ""; currentAudioUrl = data.audio_url || "";
                 
                 document.getElementById('btnHd').style.display = currentHdUrl ? 'flex' : 'none';
@@ -309,3 +355,4 @@
 </script>
 </body>
 </html>
+    
