@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <meta name="theme-color" content="#0b0f19">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    
     <title>Uvids - Premium Video & Audio Downloader</title>
     <meta name="description" content="Download high-quality videos and MP3 audio from Facebook, Instagram, and YouTube for free.">
     
@@ -246,8 +243,6 @@
     }
 
     async function getVideo() {
-        console.log("Button clicked!"); // Debugging ke liye
-
         var urlInput = document.getElementById('videoUrl').value;
         var errorDiv = document.getElementById('errorDiv');
         var btn = document.getElementById('mainBtn');
@@ -268,6 +263,7 @@
         resultArea.style.display = 'none';
         
         try {
+            // Render server cold start handle karne ke liye timeout badhaya hai
             var myApiUrl = 'https://nebula-api-6cc6.onrender.com/download'; 
             var response = await fetch(myApiUrl, {
                 method: 'POST',
@@ -276,7 +272,6 @@
             });
             
             var data = await response.json();
-            console.log("API Response:", data); // Debugging ke liye
 
             if (data.status === "success") {
                 var thumbImg = document.getElementById('vidThumb');
@@ -292,4 +287,8 @@
                 
                 document.getElementById('btnHd').onclick = function(e) { e.preventDefault(); triggerDownload(currentHdUrl); };
                 document.getElementById('btnSd').onclick = function(e) { e.preventDefault(); triggerDownload(currentSdUrl); };
-                document.getElementById('btnMp3').onclick = func
+                document.getElementById('btnMp3').onclick = function(e) { e.preventDefault(); triggerDownload(currentAudioUrl); };
+
+                resultArea.style.display = 'block';
+            } else {
+                errorDi
