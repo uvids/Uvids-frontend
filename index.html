@@ -41,13 +41,10 @@
         
         .app-container { width: 100%; max-width: 480px; flex: 1; }
 
-        /* =========================================
-           NEW MODERN PROFESSIONAL LOGO (No Cutting)
-           ========================================= */
+        /* HEADER & MODERN PROFESSIONAL LOGO */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .logo-container { display: flex; align-items: center; gap: 8px; }
         
-        /* Logo Icon */
         .logo-icon {
             width: 38px; height: 38px;
             background: linear-gradient(135deg, #a855f7, #ec4899);
@@ -57,7 +54,6 @@
         }
         .logo-icon svg { width: 20px; height: 20px; fill: white; }
         
-        /* Logo Text */
         .brand-text { 
             font-family: 'Poppins', sans-serif;
             font-size: 24px; 
@@ -170,14 +166,12 @@
 <body>
 
 <div class="app-container">
-    <!-- BRAND NEW PROFESSIONAL HEADER -->
+    <!-- HEADER -->
     <header class="header">
         <div class="logo-container">
-            <!-- Custom SVG Icon (No Clipping) -->
             <div class="logo-icon">
                 <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
-            <!-- Modern Poppins Text -->
             <div class="brand-text">
                 <span class="brand-u">U</span><span class="brand-vids">vids</span>
             </div>
@@ -279,11 +273,17 @@
             <a href="terms.html">Terms</a>
             <a href="contact.html">Contact</a>
         </div>
+        
+        <!-- AAPKA NAYA MESSAGE YAHAN HAI -->
+        <p style="margin-bottom: 10px; font-weight: 500; color: #e2e8f0;">
+            Made with <span style="color: #ec4899;">❤️</span> From Village Post Basari M.P
+        </p>
+        
         <strong>Uvids</strong> · Simple tools for video links.
     </div>
 </div>
 
-<!-- BOTTOM NAVIGATION (Modern Fixed) -->
+<!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav">
     <a href="#" class="nav-item active">
         <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -366,5 +366,6 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: urlInput })
             });
-
-    
+            
+            var data = await response.json();
+   
