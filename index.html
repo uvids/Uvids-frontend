@@ -1,80 +1,295 @@
-async function getVideo() {
-    var urlInput = document.getElementById('videoUrl').value;
-    var errorDiv = document.getElementById('errorDiv');
-    var btn = document.getElementById('mainBtn');
-    var btnText = document.getElementById('btnText');
-    var btnLoader = document.getElementById('btnLoader');
-    var resultArea = document.getElementById('resultArea');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    if (!urlInput) { 
-        errorDiv.style.display = 'block'; 
-        errorDiv.innerText = "Please enter a valid URL."; 
-        return; 
-    }
+    <title>Uvids - Premium Video & Audio Downloader</title>
+    <meta name="description" content="Download high-quality videos and MP3 audio from Facebook, Instagram, and YouTube for free.">
     
-    errorDiv.style.display = 'none';
-    btn.disabled = true; 
-    btnText.style.display = 'none'; 
-    btnLoader.style.display = 'block';
-    resultArea.style.display = 'none';
-    
-    var myApiUrl = 'https://nebula-api-6cc6.onrender.com/download'; 
-    var maxRetries = 3;
-    var delay = 5000; // 5 seconds wait
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23a855f7'/><text y='.9em' font-size='80' x='10' fill='white'>▶</text></svg>">
 
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            var response = await fetch(myApiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: urlInput })
-            });
+    <style>
+        :root {
+            --bg-color: #05070e; --card-bg: #111420; --border-color: #1f2436;
+            --text-main: #f3f4f6; --text-muted: #9ca3af;
+            --primary: #6366f1; --primary-hover: #4f46e5; --success: #10b981;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 15px 100px 15px; }
+        
+        .app-container { width: 100%; max-width: 480px; flex: 1; }
+
+        /* HEADER */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .logo-container { display: flex; align-items: center; gap: 8px; }
+        .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, #a855f7, #ec4899); border-radius: 10px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3); }
+        .logo-icon svg { width: 20px; height: 20px; fill: white; }
+        .brand-text { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; line-height: 1; padding-bottom: 2px; }
+        .brand-u { color: #a855f7; margin-right: 1px; }
+        .brand-vids { color: #ffffff; }
+        .badge { font-size: 10px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 6px 12px; border-radius: 20px; }
+
+        /* HERO */
+        .hero { text-align: center; margin-bottom: 25px; }
+        .hero h1 { font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 800; line-height: 1.15; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .hero h1 span { color: var(--primary); }
+        .hero p { color: var(--text-muted); font-size: 14px; }
+
+        /* TABS */
+        .tabs-container { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; }
+        .tab-btn { flex: 1; min-width: 0; background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px 5px; border-radius: 12px; color: var(--text-muted); font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .tab-btn.active { background: rgba(99, 102, 241, 0.15); border-color: var(--primary); color: white; }
+        .tab-btn svg { width: 16px; height: 16px; flex-shrink: 0; } 
+        .tab-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* TOOL CARD */
+        .tool-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px 20px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .input-field { width: 100%; padding: 16px; background: #03050a; border: 1px solid var(--border-color); border-radius: 12px; color: white; font-size: 15px; outline: none; margin-bottom: 15px; transition: 0.3s;}
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(99, 102, 241, 0.2); }
+        
+        .action-btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.3s; }
+        .action-btn:hover { background: var(--primary-hover); }
+        .action-btn:disabled { background: #374151; cursor: not-allowed; }
+
+        /* RESULT AREA */
+        .result-area { display: none; margin-top: 25px; background: #03050a; border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
+        .video-thumb { width: 100%; border-radius: 12px; margin-bottom: 15px; display: none; object-fit: cover; max-height: 200px; }
+        .video-title { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 15px; line-height: 1.4; }
+        
+        .dl-btn { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 15px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; margin-bottom: 10px; color: white !important; transition: 0.3s; }
+        .dl-btn:hover { transform: scale(1.02); }
+        .btn-hd { background: var(--success); }
+        .btn-sd { background: #3b82f6; }
+        .btn-mp3 { background: #f59e0b; }
+        
+        .reset-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 10px; text-align: center; transition: 0.3s; }
+
+        /* ERROR ALERT */
+        .error-alert { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; padding: 12px; border-radius: 10px; font-size: 13px; margin-top: 15px; text-align: center; line-height: 1.4; word-wrap: break-word; }
+
+        /* SECTIONS */
+        .section-title { font-family: 'Poppins', sans-serif; text-align: center; font-size: 20px; font-weight: 700; margin: 40px 0 20px; scroll-margin-top: 20px; }
+        .steps-container { display: flex; flex-direction: column; gap: 15px; }
+        .step-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; text-align: center; }
+        .step-num { width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 10px; }
+        .step-card h4 { font-size: 15px; margin-bottom: 5px; }
+        .step-card p { color: var(--text-muted); font-size: 13px; }
+
+        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .feature-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 16px; text-align: center; }
+        .feature-icon { font-size: 24px; margin-bottom: 10px; }
+        .feature-box h4 { font-size: 14px; margin-bottom: 5px; }
+        .feature-box p { color: var(--text-muted); font-size: 11px; }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(17, 20, 32, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 30px; display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; font-weight: 600; text-decoration: none; gap: 4px; cursor: pointer; transition: 0.3s; }
+        .nav-item.active, .nav-item:hover { color: var(--primary); }
+        .nav-icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* ADS & FOOTER */
+        .ad-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; min-height: 100px; }
+        .footer { text-align: center; color: var(--text-muted); font-size: 12px; line-height: 1.8; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; }
+        
+        .loader { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="brand-text">
+                <span class="brand-u">U</span><span class="brand-vids">vids</span>
+            </div>
+        </div>
+        <div class="badge">● Free</div>
+    </header>
+
+    <div class="hero">
+        <h1>Videos & Audio <br><span>made simple.</span></h1>
+        <p>Download in high-quality from your favorite platforms.</p>
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="setTab('YouTube', this)">
+            <svg viewBox="0 0 24 24" fill="#ff0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span>YouTube</span>
+        </button>
+        <button class="tab-btn" onclick="setTab('Instagram', this)">
+            <svg viewBox="0 0 24 24" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+            <span>Instagram</span>
+        </button>
+        <button class="tab-btn" onclick="setTab('Facebook', this)">
+            <svg viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span>Facebook</span>
+        </button>
+    </div>
+
+    <div class="tool-card">
+        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">PASTE VIDEO LINK</label>
+        <input type="text" id="videoUrl" class="input-field" placeholder="https://www.youtube.com/...">
+        
+        <button id="mainBtn" class="action-btn" onclick="getVideo()">
+            <span id="btnText">Check Link ↗</span>
+            <div id="btnLoader" class="loader"></div>
+        </button>
+
+        <div id="errorDiv" class="error-alert"></div>
+
+        <div id="resultArea" class="result-area">
+            <img id="vidThumb" class="video-thumb" src="">
+            <div id="vidTitle" class="video-title"></div>
             
-            var data = await response.json();
+            <a id="btnHd" href="#" target="_blank" class="dl-btn btn-hd">Download HD Video</a>
+            <a id="btnSd" href="#" target="_blank" class="dl-btn btn-sd">Download Normal Video</a>
+            <a id="btnMp3" href="#" target="_blank" class="dl-btn btn-mp3">🎵 Download MP3 Audio</a>
+            
+            <button class="reset-btn" onclick="resetTool()">🔄 Download Another Video</button>
+        </div>
+    </div>
 
-            if (data.status === "success") {
-                var thumbImg = document.getElementById('vidThumb');
-                if (data.thumbnail) { thumbImg.src = data.thumbnail; thumbImg.style.display = 'block'; } 
-                else { thumbImg.style.display = 'none'; }
-                
-                document.getElementById('vidTitle').innerText = data.title || "Video Found";
-                currentHdUrl = data.hd_url || ""; currentSdUrl = data.sd_url || ""; currentAudioUrl = data.audio_url || "";
-                
-                document.getElementById('btnHd').style.display = currentHdUrl ? 'flex' : 'none';
-                document.getElementById('btnSd').style.display = currentSdUrl ? 'flex' : 'none';
-                document.getElementById('btnMp3').style.display = currentAudioUrl ? 'flex' : 'none';
-                
-                document.getElementById('btnHd').onclick = function(e) { e.preventDefault(); triggerDownload(currentHdUrl); };
-                document.getElementById('btnSd').onclick = function(e) { e.preventDefault(); triggerDownload(currentSdUrl); };
-                document.getElementById('btnMp3').onclick = function(e) { e.preventDefault(); triggerDownload(currentAudioUrl); };
+    <div id="offers-section" class="ad-container">
+        <span style="color:#374151; font-size:12px;">[ Advertisement ]</span>
+    </div>
 
-                resultArea.style.display = 'block';
-                btn.disabled = false; btnText.style.display = 'block'; btnLoader.style.display = 'none';
-                return; // Success! Loop se bahar nikal jao
-                
-            } else {
-                // Agar API error de rahi hai
-                errorDiv.style.display = 'block';
-                errorDiv.innerText = "Error: " + (data.detail || "Video not found.");
-                break; // Retry mat karo agar link hi galat hai
-            }
-        } catch (e) {
-            // Agar network error aaya (Server so raha hai), toh retry karo
-            if (i < maxRetries - 1) {
-                btnLoader.style.display = 'none';
-                btnText.innerText = `Waking server... (Try ${i+1}/${maxRetries})`;
-                btnText.style.display = 'block';
-                await new Promise(r => setTimeout(r, delay)); // Wait karo
-                btnText.style.display = 'none';
-                btnLoader.style.display = 'block';
-            } else {
-                errorDiv.style.display = 'block';
-                errorDiv.innerText = "Server is taking too long. Please try again later.";
-            }
+    <h2 id="how-to" class="section-title">How to Download?</h2>
+    <div class="steps-container">
+        <div class="step-card"><div class="step-num">1</div><h4>Copy the Link</h4><p>Open the app and copy the video link.</p></div>
+        <div class="step-card"><div class="step-num">2</div><h4>Paste it Here</h4><p>Paste the link above and click Check Link.</p></div>
+        <div class="step-card"><div class="step-num">3</div><h4>Download</h4><p>Choose your quality and save it.</p></div>
+    </div>
+
+    <h2 id="features" class="section-title">Why Choose Uvids?</h2>
+    <div class="features-grid">
+        <div class="feature-box"><div class="feature-icon">⚡</div><h4>Super Fast</h4><p>Instant downloads.</p></div>
+        <div class="feature-box"><div class="feature-icon">🔒</div><h4>100% Private</h4><p>We never store links.</p></div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-links">
+            <a href="about.html">About Us</a>
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="disclaimer.html">Disclaimer</a>
+            <a href="dmca.html">DMCA</a>
+            <a href="contact.html">Contact</a>
+        </div>
+        <p style="margin-bottom: 10px; font-weight: 500; color: #e2e8f0;">Made with <span style="color: #ec4899;">❤️</span> From Village Post Basari M.P</p>
+        <strong>Uvids</strong> · Simple tools for video links.
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <a href="#" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span>Home</span></a>
+    <a href="#how-to" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><span>How to Use</span></a>
+    <a href="#features" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg><span>Features</span></a>
+</div>
+
+<div id="adModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:#111827; border:1px solid #1f2937; border-radius:20px; padding:25px; width:90%; max-width:400px; text-align:center;">
+        <h2 style="color:white; font-size:18px; margin-bottom:15px;">Your download is ready!</h2>
+        <div style="margin-bottom:20px; min-height:250px; display:flex; justify-content:center; align-items:center; background:#030712; border:1px dashed #374151; border-radius:12px;">
+            <span style="color:#374151; font-size:12px;">[ Ad Space ]</span>
+        </div>
+        <button onclick="startActualDownload()" style="width:100%; padding:15px; background:#10b981; color:white; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer;">Close Ad & Download</button>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- AAPKA JAVASCRIPT CODE YAHAN HAI -->
+<!-- ========================================== -->
+<script>
+    var currentHdUrl = ""; var currentSdUrl = ""; var currentAudioUrl = ""; var pendingDownloadUrl = "";
+
+    function setTab(platform, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        var input = document.getElementById('videoUrl');
+        input.focus();
+        if(platform === 'YouTube') input.placeholder = "https://www.youtube.com/watch?v=...";
+        if(platform === 'Instagram') input.placeholder = "https://www.instagram.com/reel/...";
+        if(platform === 'Facebook') input.placeholder = "https://www.facebook.com/watch/...";
+    }
+
+    function resetTool() {
+        document.getElementById('videoUrl').value = '';
+        document.getElementById('resultArea').style.display = 'none';
+        document.getElementById('errorDiv').style.display = 'none';
+        currentHdUrl = ""; currentSdUrl = ""; currentAudioUrl = "";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function triggerDownload(url) {
+        if (!url) return;
+        pendingDownloadUrl = url;
+        document.getElementById('adModal').style.display = 'flex';
+    }
+
+    function startActualDownload() {
+        document.getElementById('adModal').style.display = 'none';
+        if(pendingDownloadUrl) {
+            window.open(pendingDownloadUrl, '_blank');
+            pendingDownloadUrl = "";
         }
     }
-    
-    btn.disabled = false; 
-    btnText.style.display = 'block'; 
-    btnLoader.style.display = 'none';
-}
+
+    async function getVideo() {
+        var urlInput = document.getElementById('videoUrl').value;
+        var errorDiv = document.getElementById('errorDiv');
+        var btn = document.getElementById('mainBtn');
+        var btnText = document.getElementById('btnText');
+        var btnLoader = document.getElementById('btnLoader');
+        var resultArea = document.getElementById('resultArea');
+        
+        if (!urlInput) { 
+            errorDiv.style.display = 'block'; 
+            errorDiv.innerText = "Please enter a valid URL."; 
+            return; 
+        }
+        
+        errorDiv.style.display = 'none';
+        btn.disabled = true; 
+        btnText.style.display = 'none'; 
+        btnLoader.style.display = 'block';
+        resultArea.style.display = 'none';
+        
+        var myApiUrl = 'https://nebula-api-6cc6.onrender.com/download'; 
+        var maxRetries = 3;
+        var delay = 5000; // 5 seconds wait
+
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                var response = await fetch(myApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlInput })
+                });
+                
+                var data = await response.json();
+
+                if (data.status === "success") {
+                    var thumbImg = document.getElementById('vidThumb');
+                    if (data.thumbnail) { thumbImg.src = data.thumbnail; thumbImg.style.display = 'block'; } 
+                    else { thumbImg.style.display = 'none'; }
+                    
+                    document.getElementById('vidTitle').innerText = data.title || "Video Found";
+                    currentHdUrl = data.hd_url || ""; currentSdUrl = data.sd_url || ""; currentAudioUrl = data.audio_url || "";
+                    
+                    document.getElementById('btnHd').style.display = currentHdUrl ? 'flex' : 'none';
+                    document.getElementById('btnSd').style.display = currentSdUrl ? 'flex' : 'none';
+                    document.getElementById('btnMp3').style.display = currentAudioUrl ? 'flex' : 'none';
+                    
+                    document.getElementById('btnHd').onclick = function(e) { e.preventDefault(); triggerDownload(currentHdUrl); };
+                    document.getElementById('btnSd').onclick = function(e) { e.preventDefau
